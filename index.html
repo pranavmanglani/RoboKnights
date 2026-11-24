@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050505">
+  <meta name="description" content="RoboKnights — engineered to compete. A robotics team built around engineering, innovation and competition.">
+  <title>RoboKnights — Engineered to Compete</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --black: #050505;
+      --carbon: #0c0c0d;
+      --graphite: #151517;
+      --steel: #777b82;
+      --silver: #bfc3ca;
+      --ice: #f2f3f5;
+      --muted: #92959c;
+      --line: rgba(255,255,255,.12);
+      --glass: rgba(255,255,255,.045);
+      --radius: 18px;
+      --max: 1240px;
+      --ease: cubic-bezier(.2,.75,.25,1);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 100px; }
+    body {
+      margin: 0;
+      color: var(--ice);
+      background:
+        radial-gradient(ellipse at 78% 8%, rgba(190,195,205,.11), transparent 29%),
+        radial-gradient(ellipse at 8% 48%, rgba(120,125,135,.07), transparent 32%),
+        var(--black);
+      font-family: Inter, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: .2;
+      background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: linear-gradient(to bottom, black, transparent 82%);
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+      opacity: .12;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.13'/%3E%3C/svg%3E");
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+    img { display: block; max-width: 100%; }
+    ::selection { background: var(--silver); color: var(--black); }
+
+    .container { width: min(var(--max), calc(100% - 48px)); margin-inline: auto; }
+    .eyebrow, .mono { font-family: "DM Mono", monospace; text-transform: uppercase; letter-spacing: .14em; }
+    .eyebrow { color: var(--silver); font-size: .72rem; }
+    .section { padding: 112px 0; position: relative; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 32px; margin-bottom: 42px; }
+    .section-head h2 { margin: 10px 0 0; font: 600 clamp(2.2rem, 5vw, 4rem)/1.02 "Space Grotesk", sans-serif; letter-spacing: -.055em; }
+    .section-head p { max-width: 390px; color: var(--muted); margin: 0; font-size: .95rem; }
+    .muted { color: var(--muted); }
+
+    /* Navigation */
+    .site-header { position: fixed; inset: 16px 0 auto; z-index: 30; transition: .35s var(--ease); }
+    .nav-shell {
+      min-height: 68px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; border: 1px solid transparent; border-radius: 16px;
+      transition: .35s var(--ease);
+    }
+    .site-header.scrolled .nav-shell {
+      background: rgba(12,12,13,.78); border-color: var(--line);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 12px 40px rgba(0,0,0,.24);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 12px; font: 700 1.05rem "Space Grotesk", sans-serif; letter-spacing: -.03em; }
+    .brand img { width: 38px; height: 38px; object-fit: contain; }
+    .brand-mark { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid var(--silver); border-radius: 11px; color: var(--ice); font: 700 .9rem "Space Grotesk"; }
+    .brand span small { display: block; color: var(--muted); font: 400 .55rem "DM Mono", monospace; letter-spacing: .18em; margin-top: -2px; }
+    .nav-links { display: flex; align-items: center; gap: clamp(15px, 2vw, 28px); }
+    .nav-links a { color: #b8bbc1; font: 500 .68rem "DM Mono", monospace; letter-spacing: .08em; transition: color .2s; }
+    .nav-links a:hover, .nav-links a.active { color: white; }
+    .nav-cta { padding: 11px 16px; border: 1px solid rgba(255,255,255,.28); border-radius: 8px; color: var(--ice) !important; }
+    .menu-toggle { display: none; width: 42px; height: 42px; color: white; background: var(--glass); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }
+
+    /* Hero */
+    .hero { min-height: 780px; min-height: min(900px, 100svh); display: flex; align-items: center; padding: 150px 0 90px; overflow: hidden; }
+    .hero::before {
+      content: ""; position: absolute; width: 620px; height: 620px; right: -100px; top: 10%;
+      border: 1px solid rgba(255,255,255,.09); border-radius: 50%;
+      box-shadow: 0 0 0 48px rgba(255,255,255,.018), 0 0 0 96px rgba(255,255,255,.012), inset 0 0 90px rgba(255,255,255,.035);
+      pointer-events: none;
+    }
+    .hero::after { content: ""; position: absolute; right: 5%; top: 18%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(220,225,235,.13), transparent 68%); filter: blur(18px); pointer-events: none; }
+    .hero-content { position: relative; z-index: 1; max-width: 900px; }
+    .hero-kicker { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 26px; color: var(--silver); font: .72rem "DM Mono", monospace; letter-spacing: .16em; }
+    .hero-kicker::before { content: ""; width: 34px; height: 1px; background: var(--silver); }
+    .hero h1 { max-width: 1000px; margin: 0; font: 700 clamp(4rem, 10.2vw, 9.5rem)/.88 "Space Grotesk", sans-serif; letter-spacing: -.085em; text-transform: uppercase; }
+    .hero h1 span { display: block; color: transparent; -webkit-text-stroke: 1px rgba(242,243,245,.72); }
+    .hero-copy { max-width: 500px; color: #a8abb2; margin: 30px 0 30px; font-size: 1rem; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .btn { display: inline-flex; justify-content: center; align-items: center; gap: 12px; padding: 14px 20px; border-radius: 9px; border: 1px solid rgba(255,255,255,.22); font: 600 .76rem "DM Mono", monospace; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: transform .25s var(--ease), background .25s, border-color .25s; }
+    .btn:hover { transform: translateY(-3px); border-color: rgba(255,255,255,.6); }
+    .btn-primary { color: #090909; background: var(--ice); border-color: var(--ice); }
+    .btn-primary:hover { background: white; }
+    .btn-ghost { background: rgba(255,255,255,.035); color: var(--ice); }
+    .hero-foot { position: absolute; bottom: 34px; left: 0; right: 0; display: flex; justify-content: space-between; color: #777b82; font: .65rem "DM Mono", monospace; letter-spacing: .12em; text-transform: uppercase; }
+    .scroll-cue { display: inline-flex; align-items: center; gap: 12px; }
+    .scroll-cue::before { content: ""; width: 34px; height: 1px; background: #777b82; }
+
+    /* Ticker */
+    .ticker { overflow: hidden; border-block: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .ticker-track { display: flex; width: max-content; animation: ticker 34s linear infinite; }
+    .ticker-item { padding: 17px 30px; color: #aeb2ba; font: .7rem "DM Mono", monospace; letter-spacing: .16em; white-space: nowrap; }
+    .ticker-item b { color: white; margin-right: 25px; }
+    @keyframes ticker { to { transform: translateX(-50%); } }
+
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--glass); backdrop-filter: blur(14px); }
+    .stat { padding: 30px; border-right: 1px solid var(--line); }
+    .stat:last-child { border: 0; }
+    .stat strong { display: block; font: 600 clamp(2.4rem, 5vw, 4rem)/1 "Space Grotesk"; letter-spacing: -.06em; }
+    .stat span { display: block; margin-top: 12px; color: var(--muted); font: .68rem "DM Mono"; letter-spacing: .12em; text-transform: uppercase; }
+
+    /* About */
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    .about-title { font: 600 clamp(2.6rem, 5.6vw, 5rem)/.98 "Space Grotesk"; letter-spacing: -.065em; margin: 14px 0 0; }
+    .about-title em { color: var(--silver); font-style: normal; }
+    .about-copy p { color: #a5a8af; margin: 0 0 18px; }
+    .about-note { margin-top: 28px; padding: 20px 22px; border-left: 2px solid var(--silver); background: linear-gradient(90deg, rgba(255,255,255,.07), transparent); color: var(--ice); font: 500 1.05rem "Space Grotesk"; }
+
+    /* Cards */
+    .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .glass-card { min-width: 0; overflow: hidden; background: var(--glass); border: 1px solid var(--line); border-radius: var(--radius); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); transition: transform .35s var(--ease), border-color .35s, background .35s; }
+    .glass-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,.3); background: rgba(255,255,255,.065); }
+    .card-image { aspect-ratio: 16/10; overflow: hidden; background: linear-gradient(135deg, #252629, #101012); position: relative; }
+    .card-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s var(--ease), opacity .3s; }
+    .glass-card:hover .card-image img { transform: scale(1.045); }
+    .image-placeholder { height: 100%; display: grid; place-items: center; color: rgba(255,255,255,.32); font: .7rem "DM Mono"; letter-spacing: .15em; text-transform: uppercase; background: radial-gradient(circle at 50% 45%, #3a3b3e, #121214 68%); }
+    .card-body { padding: 23px; }
+    .card-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--silver); font: .64rem "DM Mono"; letter-spacing: .12em; text-transform: uppercase; }
+    .card-body h3 { margin: 13px 0 9px; font: 600 1.45rem/1.15 "Space Grotesk"; letter-spacing: -.035em; }
+    .card-body p { margin: 0; color: var(--muted); font-size: .88rem; }
+    .card-open { display: inline-flex; margin-top: 20px; padding: 0; color: var(--ice); background: none; border: 0; cursor: pointer; font: .68rem "DM Mono"; letter-spacing: .1em; text-transform: uppercase; }
+    .card-open span { margin-left: 10px; transition: transform .2s; }
+    .card-open:hover span { transform: translate(4px,-2px); }
+    .text-card { min-height: 260px; padding: 26px; display: flex; flex-direction: column; justify-content: space-between; }
+    .text-card .index { color: #777b82; font: .7rem "DM Mono"; }
+    .text-card h3 { font: 600 1.7rem/1.05 "Space Grotesk"; letter-spacing: -.045em; margin: 28px 0 10px; }
+    .text-card p { color: var(--muted); font-size: .88rem; margin: 0; }
+
+    /* Feature strip */
+    .manifesto { padding: 90px 0; border-block: 1px solid var(--line); background: linear-gradient(110deg, rgba(255,255,255,.055), transparent 70%); }
+    .manifesto h2 { max-width: 1000px; margin: 14px 0 0; font: 600 clamp(2.5rem, 6.5vw, 6rem)/.98 "Space Grotesk"; letter-spacing: -.07em; }
+    .manifesto h2 span { color: var(--steel); }
+
+    /* Team */
+    .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .member { cursor: pointer; text-align: left; padding: 0; color: inherit; }
+    .member .card-image { aspect-ratio: 4/4.6; }
+    .member .card-body { padding: 18px; }
+    .member h3 { margin: 0 0 4px; font: 600 1.1rem "Space Grotesk"; }
+    .member .role { color: var(--muted); font: .65rem "DM Mono"; letter-spacing: .1em; text-transform: uppercase; }
+    .member:focus-visible, .card-open:focus-visible, a:focus-visible, button:focus-visible { outline: 2px solid white; outline-offset: 4px; }
+
+    /* Gallery */
+    .gallery-grid { display: grid; grid-template-columns: 1.25fr .8fr .8fr; grid-auto-rows: 220px; gap: 12px; }
+    .gallery-item { position: relative; padding: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: #171719; cursor: zoom-in; }
+    .gallery-item:first-child { grid-row: span 2; }
+    .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease); }
+    .gallery-item:hover img { transform: scale(1.05); }
+    .gallery-label { position: absolute; inset: auto 0 0; padding: 35px 16px 14px; text-align: left; color: white; font: .68rem "DM Mono"; letter-spacing: .1em; text-transform: uppercase; background: linear-gradient(transparent, rgba(0,0,0,.8)); }
+
+    /* Contact/footer */
+    .contact-panel { display: grid; grid-template-columns: 1fr auto; gap: 30px; align-items: end; padding: clamp(28px, 5vw, 58px); border: 1px solid rgba(255,255,255,.2); border-radius: 22px; background: radial-gradient(ellipse at 90% 10%, rgba(255,255,255,.13), transparent 45%), var(--glass); }
+    .contact-panel h2 { max-width: 700px; margin: 12px 0 0; font: 600 clamp(2.7rem, 6vw, 5.8rem)/.95 "Space Grotesk"; letter-spacing: -.07em; }
+    .contact-panel p { color: var(--muted); max-width: 490px; }
+    footer { padding: 35px 0 28px; }
+    .footer-top { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-bottom: 25px; border-bottom: 1px solid var(--line); }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 20px; color: var(--muted); font: .65rem "DM Mono"; text-transform: uppercase; letter-spacing: .1em; }
+    .footer-bottom { display: flex; justify-content: space-between; gap: 15px; padding-top: 18px; color: #73767d; font: .62rem "DM Mono"; letter-spacing: .08em; text-transform: uppercase; }
+
+    /* Modal */
+    .modal { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 24px; background: rgba(0,0,0,.78); backdrop-filter: blur(12px); opacity: 0; visibility: hidden; transition: opacity .25s, visibility .25s; }
+    .modal.open { opacity: 1; visibility: visible; }
+    .modal-panel { width: min(720px, 100%); max-height: min(82svh, 760px); overflow: auto; position: relative; border: 1px solid rgba(255,255,255,.18); border-radius: 20px; background: #111113; box-shadow: 0 30px 100px rgba(0,0,0,.6); transform: translateY(18px) scale(.985); transition: transform .3s var(--ease); }
+    .modal.open .modal-panel { transform: translateY(0) scale(1); }
+    .modal-panel img { width: 100%; max-height: 330px; object-fit: cover; }
+    .modal-content { padding: clamp(24px, 5vw, 42px); }
+    .modal-content h2 { margin: 10px 0 14px; font: 600 clamp(2rem, 5vw, 3.5rem)/1 "Space Grotesk"; letter-spacing: -.055em; }
+    .modal-content p { color: #a5a8af; }
+    .modal-close { position: sticky; float: right; top: 12px; margin: 12px 12px -52px 0; z-index: 2; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 50%; background: rgba(0,0,0,.7); color: white; cursor: pointer; font-size: 1.2rem; }
+    .modal-image-only { width: min(1000px, 100%); background: transparent; border: 0; box-shadow: none; overflow: visible; }
+    .modal-image-only img { max-height: 82svh; border-radius: 12px; object-fit: contain; }
+    .modal-image-only .modal-close { margin-bottom: -52px; }
+
+    /* Reveal */
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+
+    @media (max-width: 980px) {
+      .nav-links { gap: 14px; }
+      .nav-links a { font-size: .61rem; }
+      .about-grid { gap: 40px; }
+      .team-grid { grid-template-columns: repeat(2, 1fr); }
+      .card-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 760px) {
+      .container { width: min(100% - 34px, var(--max)); }
+      .section { padding: 78px 0; }
+      .site-header { inset: 10px 0 auto; }
+      .nav-shell { min-height: 60px; padding: 0 12px; }
+      .menu-toggle { display: grid; place-items: center; }
+      .nav-links { position: absolute; top: 68px; left: 0; right: 0; display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 10px; border: 1px solid var(--line); border-radius: 14px; background: rgba(12,12,13,.96); backdrop-filter: blur(18px); opacity: 0; visibility: hidden; transform: translateY(-8px); transition: .25s; }
+      .nav-links.open { opacity: 1; visibility: visible; transform: translateY(0); }
+      .nav-links a { padding: 14px 12px; font-size: .72rem; border-radius: 7px; }
+      .nav-links a:hover { background: rgba(255,255,255,.06); }
+      .nav-cta { text-align: center; margin-top: 6px; }
+      .hero { min-height: 760px; min-height: 92svh; padding: 130px 0 90px; }
+      .hero h1 { font-size: clamp(3.5rem, 16vw, 7rem); }
+      .hero::before { width: 390px; height: 390px; right: -230px; top: 24%; }
+      .hero::after { right: -25%; top: 30%; }
+      .hero-foot { bottom: 20px; font-size: .56rem; }
+      .section-head { display: block; margin-bottom: 28px; }
+      .section-head p { margin-top: 16px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .stat { padding: 23px; border-bottom: 1px solid var(--line); }
+      .stat:nth-child(2) { border-right: 0; }
+      .stat:nth-child(3), .stat:nth-child(4) { border-bottom: 0; }
+      .about-grid { grid-template-columns: 1fr; gap: 28px; }
+      .card-grid { grid-template-columns: 1fr; }
+      .text-card { min-height: 220px; }
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 170px; }
+      .gallery-item:first-child { grid-row: span 2; }
+      .contact-panel { grid-template-columns: 1fr; align-items: start; }
+      .footer-top, .footer-bottom { align-items: flex-start; flex-direction: column; }
+    }
+    @media (max-width: 420px) {
+      .hero h1 { font-size: 3.35rem; }
+      .hero-copy { font-size: .9rem; }
+      .hero-foot .right-note { display: none; }
+      .team-grid { gap: 10px; }
+      .member .card-body { padding: 14px; }
+      .gallery-grid { grid-auto-rows: 135px; gap: 8px; }
+      .stat { padding: 18px; }
+    }
+  </style>
+</head>
+
+<body>
+  <!--
+    QUICK EDIT GUIDE
+    1. Replace assets/logo.png with the path to your existing RoboKnights logo.
+    2. Replace the placeholder image paths with your actual team/robot photos.
+    3. To add a card, copy one complete <article class="glass-card"...> block and edit its data-* attributes and visible text.
+    4. Every card opens its own detail modal. Edit data-title, data-category and data-description.
+    5. No backend or API is used. All website content is static in this file.
+  -->
+
+  <header class="site-header" id="siteHeader">
+    <div class="container nav-shell">
+      <a class="brand" href="#home" aria-label="RoboKnights home">
+        <!-- Keep your existing logo; update this path if your logo file is elsewhere. -->
+        <img src="assets/logo.png" alt="RoboKnights logo" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+        <span class="brand-mark" style="display:none">RK</span>
+        <span>ROBOKNIGHTS<small>ROBOTICS TEAM</small></span>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Open navigation" aria-expanded="false">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+
+      <nav class="nav-links" id="navLinks" aria-label="Main navigation">
+        <a href="#home">HOME</a>
+        <a href="#about">ABOUT</a>
+        <a href="#competitions">COMPETITIONS</a>
+        <a href="#robots">ROBOTS</a>
+        <a href="#projects">PROJECTS</a>
+        <a href="#team">TEAM</a>
+        <a href="#gallery">GALLERY</a>
+        <a class="nav-cta" href="#contact">LET'S CONNECT ↗</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="container">
+        <div class="hero-content reveal">
+          <div class="hero-kicker">INDEPENDENT ROBOTICS TEAM · EST. 2026</div>
+          <h1>ENGINEERED <span>TO COMPETE.</span></h1>
+          <p class="hero-copy">We turn ideas into machines, challenges into opportunities, and engineering into something that moves the world forward.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#robots">EXPLORE OUR WORK <span>↗</span></a>
+            <a class="btn btn-ghost" href="#about">MEET ROBOKNIGHTS</a>
+          </div>
+        </div>
+        <div class="hero-foot">
+          <span class="scroll-cue">SCROLL TO EXPLORE</span>
+          <span class="right-note">BUILD. INNOVATE. DOMINATE.</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="ticker" aria-label="Team motto">
+      <div class="ticker-track" aria-hidden="true">
+        <div class="ticker-item"><b>✳</b> CHIVALRY IS NOT DEAD, IT IS AUTOMATED</div><div class="ticker-item"><b>✳</b> BUILD WITH PURPOSE</div><div class="ticker-item"><b>✳</b> ENGINEERED TO COMPETE</div><div class="ticker-item"><b>✳</b> THINK. BUILD. REPEAT.</div>
+        <div class="ticker-item"><b>✳</b> CHIVALRY IS NOT DEAD, IT IS AUTOMATED</div><div class="ticker-item"><b>✳</b> BUILD WITH PURPOSE</div><div class="ticker-item"><b>✳</b> ENGINEERED TO COMPETE</div><div class="ticker-item"><b>✳</b> THINK. BUILD. REPEAT.</div>
+      </div>
+    </div>
+
+    <section class="section" id="overview">
+      <div class="container">
+        <div class="stats-grid reveal">
+          <div class="stat"><strong>01</strong><span>One team. One vision.</span></div>
+          <div class="stat"><strong>∞</strong><span>Ideas to engineer</span></div>
+          <div class="stat"><strong>100%</strong><span>Built to learn</span></div>
+          <div class="stat"><strong>24/7</strong><span>Curiosity in motion</span></div>
+        </div>
+        <!-- Replace the starter metrics above with verified team statistics whenever available. -->
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <div class="container about-grid">
+        <div class="reveal">
+          <div class="eyebrow">01 / WHO WE ARE</div>
+          <h2 class="about-title">NOT JUST BUILDING ROBOTS.<br><em>BUILDING WHAT'S NEXT.</em></h2>
+        </div>
+        <div class="about-copy reveal">
+          <p>RoboKnights is a student-led robotics team driven by curiosity, creativity and the desire to solve real engineering challenges. We bring together people who love to design, build, test and improve.</p>
+          <p>From the first sketch to the final test, every project is an opportunity to learn something new, work as a team and push an idea further than we thought possible.</p>
+          <div class="about-note">“CHIVALRY IS NOT DEAD, IT IS AUTOMATED.”</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="competitions">
+      <div class="container">
+        <div class="section-head reveal">
+          <div><div class="eyebrow">02 / THE ARENA</div><h2>COMPETITIONS</h2></div>
+          <p>Every competition is a new test of design, strategy, teamwork and execution. This is where our engineering meets the real world.</p>
+        </div>
+        <div class="card-grid">
+          <!-- Copy this article to add another competition. -->
+          <article class="glass-card reveal" tabindex="0" role="button" data-modal data-category="COMPETITION" data-title="Competition name" data-description="Add the competition overview here: what the challenge involved, what your team built, and what you learned or achieved.">
+            <div class="card-image"><div class="image-placeholder">ADD COMPETITION PHOTO</div></div>
+            <div class="card-body"><div class="card-meta"><span>UPCOMING / PAST EVENT</span><span>01</span></div><h3>Competition Name</h3><p>Add a short description of the event and your team's participation.</p><button class="card-open" type="button">VIEW DETAILS <span>↗</span></button></div>
+          </article>
+          <article class="glass-card reveal" tabindex="0" role="button" data-modal data-category="COMPETITION" data-title="Competition name" data-description="Add the competition overview here: what the challenge involved, what your team built, and what you learned or achieved.">
+            <div class="card-image"><div class="image-placeholder">ADD EVENT PHOTO</div></div>
+            <div class="card-body"><div class="card-meta"><span>EVENT / CHALLENGE</span><span>02</span></div><h3>Another Challenge</h3><p>Use this card for another event, tournament or robotics challenge.</p><button class="card-open" type="button">VIEW DETAILS <span>↗</span></button></div>
+          </article>
+          <article class="glass-card reveal" tabindex="0" role="button" data-modal data-category="COMPETITION" data-title="Competition name" data-description="Add the competition overview here: what the challenge involved, what your team built, and what you learned or achieved.">
+            <div class="card-image"><div class="image-placeholder">ADD TEAM PHOTO</div></div>
+            <div class="card-body"><div class="card-meta"><span>COMING SOON</span><span>03</span></div><h3>Next Mission</h3><p>Tell visitors which competition or challenge your team is preparing for.</p><button class="card-open" type="button">VIEW DETAILS <span>↗</span></button></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="robots">
+      <div class="container">
+        <div class="section-head reveal">
+          <div><div class="eyebrow">03 / BUILT BY US</div><h2>OUR ROBOTS</h2></div>
+          <p>Meet the machines that take our ideas from the workbench to the competition floor. Select a build to learn more.</p>
+        </div>
+        <div class="card-grid">
+          <!-- Copy an article to add another robot. -->
+          <article class="glass-card reveal" tabindex="0" role="button" data-modal data-category="ROBOT BUILD" data-title="Robot name" data-description="Describe this robot, its purpose, design decisions, key components and what makes the build interesting. Add specifications here too.">
+            <div class="card-image"><div class="image-placeholder">ADD ROBOT IMAGE</div></div>
+            <div class="card-body"><div class="card-meta"><span>ROBOT / 001</span><span>PROTOTYPE</span></div><h3>Robot Name</h3><p>A short introduction to this robot and the problem it is designed to solve.</p><button class="card-open" type="button">EXPLORE BUILD <span>↗</span></button></div>
+          </article>
+          <article class="glass-card reveal" tabindex="0" role="button" data-modal data-category="ROBOT BUILD" data-title="Robot name" data-description="Describe this robot, its purpose, design decisions, key components and what makes the build interesting. Add specifications here too.">
+            <div class="card-image"><div class="image-placeholder">ADD ROBOT IMAGE</div></div>
+            <div class="card-body"><div class="card-meta"><span>ROBOT / 002</span><span>IN DEVELOPMENT</span></div><h3>Next Generation</h3><p>Showcase a current build, an upgrade or a new experimental design.</p><button class="card-open" type="button">EXPLORE BUILD <span>↗</span></button></div>
+          </article>
+          <article class="glass-card reveal" tabindex="0" role="button" data-modal data-category="ROBOT BUILD" data-title="Robot name" data-description="Describe this robot, its purpose, design decisions, key components and what makes the build interesting. Add specifications here too.">
+            <div class="card-image"><div class="image-placeholder">ADD ROBOT IMAGE</div></div>
+            <div class="card-body"><div class="card-meta"><span>ROBOT / 003</span><span>CONCEPT</span></div><h3>Concept Project</h3><p>Give visitors a look at a design concept or an idea currently on the drawing board.</p><button class="card-open" type="button">EXPLORE BUILD <span>↗</span></button></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="manifesto">
+      <div class="container reveal">
+        <div class="eyebrow">OUR APPROACH / 04</div>
+        <h2>CHIVALRY IS NOT DEAD.<br><span>IT IS AUTOMATED.</span></h2>
+      </div>
+    </section>
+
+    <section class="section" id="projects">
+      <div class="container">
+        <div class="section-head reveal">
+          <div><div class="eyebrow">05 / BEYOND THE ARENA</div><h2>PROJECTS & BUILDS</h2></div>
+          <p>Robotics is more than competition. Explore the experiments, tools and engineering projects that keep us learning.</p>
+        </div>
+        <div class="card-grid">
+          <!-- Copy an article to add another project. -->
+          <article class="glass-card reveal" tabindex="0" role="button" data-modal data-category="PROJECT" data-title="Project name" data-description="Explain the project's goal, how you approached it, technologies or components used, and what you learned.">
+            <div class="card-image"><div class="image-placeholder">ADD PROJECT IMAGE</div></div>
+            <div class="card-body"><div class="card-meta"><span>ENGINEERING</span><span>01</span></div><h3>Project Name</h3><p>A short description of an engineering project or experiment.</p><button class="card-open" type="button">VIEW PROJECT <span>↗</span></button></div>
+          </article>
+          <article class="glass-card reveal" tabindex="0" role="button" data-modal data-category="PROJECT" data-title="Project name" data-description="Explain the project's goal, how you approached it, technologies or components used, and what you learned.">
+            <div class="card-image"><div class="image-placeholder">ADD PROJECT IMAGE</div></div>
+            <div class="card-body"><div class="card-meta"><span>RESEARCH & DEVELOPMENT</span><span>02</span></div><h3>Experimental Build</h3><p>Document a prototype, test or technical experiment.</p><button class="card-open" type="button">VIEW PROJECT <span>↗</span></button></div>
+          </article>
+          <article class="glass-card reveal" tabindex="0" role="button" data-modal data-category="PROJECT" data-title="Project name" data-description="Explain the project's goal, how you approached it, technologies or components used, and what you learned.">
+            <div class="card-image"><div class="image-placeholder">ADD PROJECT IMAGE</div></div>
+            <div class="card-body"><div class="card-meta"><span>DESIGN</span><span>03</span></div><h3>Design Study</h3><p>Share a design exploration, CAD model or mechanical concept.</p><button class="card-open" type="button">VIEW PROJECT <span>↗</span></button></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="team">
+      <div class="container">
+        <div class="section-head reveal">
+          <div><div class="eyebrow">06 / THE PEOPLE</div><h2>MEET THE TEAM</h2></div>
+          <p>Different minds. Shared ambition. The people behind every design, decision, build and breakthrough.</p>
+        </div>
+        <div class="team-grid">
+          <!-- Copy a button to add a team member. Replace the placeholder image with a portrait. -->
+          <button class="glass-card member reveal" type="button" data-modal data-category="TEAM MEMBER" data-title="Member name" data-description="Add a short introduction: their role, areas of interest and what they contribute to RoboKnights.">
+            <div class="card-image"><div class="image-placeholder">ADD PORTRAIT</div></div>
+            <div class="card-body"><h3>Member Name</h3><div class="role">TEAM LEAD / ROLE</div></div>
+          </button>
+          <button class="glass-card member reveal" type="button" data-modal data-category="TEAM MEMBER" data-title="Member name" data-description="Add a short introduction: their role, areas of interest and what they contribute to RoboKnights.">
+            <div class="card-image"><div class="image-placeholder">ADD PORTRAIT</div></div>
+            <div class="card-body"><h3>Member Name</h3><div class="role">MECHANICAL / ROLE</div></div>
+          </button>
+          <button class="glass-card member reveal" type="button" data-modal data-category="TEAM MEMBER" data-title="Member name" data-description="Add a short introduction: their role, areas of interest and what they contribute to RoboKnights.">
+            <div class="card-image"><div class="image-placeholder">ADD PORTRAIT</div></div>
+            <div class="card-body"><h3>Member Name</h3><div class="role">ELECTRONICS / ROLE</div></div>
+          </button>
+          <button class="glass-card member reveal" type="button" data-modal data-category="TEAM MEMBER" data-title="Member name" data-description="Add a short introduction: their role, areas of interest and what they contribute to RoboKnights.">
+            <div class="card-image"><div class="image-placeholder">ADD PORTRAIT</div></div>
+            <div class="card-body"><h3>Member Name</h3><div class="role">PROGRAMMING / ROLE</div></div>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="gallery">
+      <div class="container">
+        <div class="section-head reveal">
+          <div><div class="eyebrow">07 / IN THE WORKSHOP</div><h2>FIELD NOTES</h2></div>
+          <p>A look at the process: the people, prototypes, late-night fixes and moments that make the work worth it.</p>
+        </div>
+        <div class="gallery-grid">
+          <!-- Copy a button to add another gallery image. Set data-full to the full-size image path. -->
+          <button class="gallery-item reveal" type="button" data-gallery data-full="assets/gallery/gallery-01.jpg" aria-label="Open gallery image">
+            <div class="image-placeholder">ADD WORKSHOP PHOTO</div><span class="gallery-label">THE WORKSHOP</span>
+          </button>
+          <button class="gallery-item reveal" type="button" data-gallery data-full="assets/gallery/gallery-02.jpg" aria-label="Open gallery image">
+            <div class="image-placeholder">ADD ROBOT PHOTO</div><span class="gallery-label">IN THE MAKING</span>
+          </button>
+          <button class="gallery-item reveal" type="button" data-gallery data-full="assets/gallery/gallery-03.jpg" aria-label="Open gallery image">
+            <div class="image-placeholder">ADD TEAM PHOTO</div><span class="gallery-label">THE TEAM</span>
+          </button>
+          <button class="gallery-item reveal" type="button" data-gallery data-full="assets/gallery/gallery-04.jpg" aria-label="Open gallery image">
+            <div class="image-placeholder">ADD EVENT PHOTO</div><span class="gallery-label">ON THE FLOOR</span>
+          </button>
+          <button class="gallery-item reveal" type="button" data-gallery data-full="assets/gallery/gallery-05.jpg" aria-label="Open gallery image">
+            <div class="image-placeholder">ADD DETAIL PHOTO</div><span class="gallery-label">DETAILS MATTER</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="contact">
+      <div class="container">
+        <div class="contact-panel reveal">
+          <div>
+            <div class="eyebrow">08 / START A CONVERSATION</div>
+            <h2>HAVE A CHALLENGE FOR US?</h2>
+            <p>Interested in collaborating, supporting our work or learning more about RoboKnights? We'd like to hear from you.</p>
+          </div>
+          <a class="btn btn-primary" href="mailto:hello@roboknights.example">GET IN TOUCH ↗</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-top">
+        <a class="brand" href="#home">
+          <img src="assets/logo.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+          <span class="brand-mark" style="display:none">RK</span>
+          <span>ROBOKNIGHTS<small>ENGINEERED TO COMPETE</small></span>
+        </a>
+        <div class="footer-links">
+          <a href="#about">ABOUT</a><a href="#competitions">COMPETITIONS</a><a href="#robots">ROBOTS</a><a href="#team">TEAM</a><a href="#contact">CONTACT</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span id="year"></span> ROBOKNIGHTS. ALL RIGHTS RESERVED.</span>
+        <span>BUILT WITH PURPOSE. DESIGNED TO COMPETE.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- One reusable detail modal powers competitions, robots, projects and team cards. -->
+  <div class="modal" id="detailModal" aria-hidden="true">
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" type="button" aria-label="Close dialog">×</button>
+      <div class="modal-content">
+        <div class="eyebrow" id="modalCategory">DETAIL</div>
+        <h2 id="modalTitle">Title</h2>
+        <p id="modalDescription">Description</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gallery lightbox -->
+  <div class="modal" id="galleryModal" aria-hidden="true">
+    <div class="modal-panel modal-image-only" role="dialog" aria-modal="true" aria-label="Gallery image">
+      <button class="modal-close" type="button" aria-label="Close image">×</button>
+      <img id="galleryModalImage" src="" alt="Expanded gallery view">
+    </div>
+  </div>
+
+  <script>
+    // RoboKnights — static, single-file interactions. No API calls or backend required.
+    (() => {
+      const header = document.getElementById('siteHeader');
+      const menuToggle = document.getElementById('menuToggle');
+      const navLinks = document.getElementById('navLinks');
+      const detailModal = document.getElementById('detailModal');
+      const galleryModal = document.getElementById('galleryModal');
+      const galleryModalImage = document.getElementById('galleryModalImage');
+      let lastFocused = null;
+
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // Header glass effect
+      const updateHeader = () => header.classList.toggle('scrolled', window.scrollY > 24);
+      updateHeader();
+      window.addEventListener('scroll', updateHeader, { passive: true });
+
+      // Mobile navigation
+      menuToggle.addEventListener('click', () => {
+        const isOpen = navLinks.classList.toggle('open');
+        menuToggle.setAttribute('aria-expanded', String(isOpen));
+        menuToggle.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
+      });
+      navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        menuToggle.setAttribute('aria-label', 'Open navigation');
+      }));
+
+      // Section reveal
+      const revealObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+      // Active navigation item
+      const sections = [...document.querySelectorAll('main section[id]')];
+      const navObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          navLinks.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === '#' + entry.target.id);
+          });
+        });
+      }, { rootMargin: '-35% 0px -55% 0px' });
+      sections.forEach(section => navObserver.observe(section));
+
+      function openModal(modal) {
+        lastFocused = document.activeElement;
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        const close = modal.querySelector('.modal-close');
+        if (close) close.focus();
+      }
+
+      function closeModal(modal) {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        if (!document.querySelector('.modal.open')) document.body.style.overflow = '';
+        if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+      }
+
+      // Details: data attributes make each card easy to edit in the HTML.
+      document.querySelectorAll('[data-modal]').forEach(card => {
+        const activate = () => {
+          document.getElementById('modalCategory').textContent = card.dataset.category || 'DETAIL';
+          document.getElementById('modalTitle').textContent = card.dataset.title || 'RoboKnights';
+          document.getElementById('modalDescription').textContent = card.dataset.description || '';
+          openModal(detailModal);
+        };
+        card.addEventListener('click', event => {
+          if (event.target.closest('a')) return;
+          activate();
+        });
+        if (card.tagName !== 'BUTTON') {
+          card.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              activate();
+            }
+          });
+        }
+      });
+
+      // Gallery: replace the placeholder div with an <img> to show a real photo.
+      document.querySelectorAll('[data-gallery]').forEach(item => {
+        item.addEventListener('click', () => {
+          const image = item.querySelector('img');
+          const src = item.dataset.full || (image && image.src);
+          if (!src) return;
+          galleryModalImage.src = src;
+          galleryModalImage.alt = item.getAttribute('aria-label') || 'RoboKnights gallery image';
+          openModal(galleryModal);
+        });
+      });
+
+      // Close buttons, backdrop click and Escape key
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.querySelector('.modal-close').addEventListener('click', () => closeModal(modal));
+        modal.addEventListener('click', event => {
+          if (event.target === modal) closeModal(modal);
+        });
+      });
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+          document.querySelectorAll('.modal.open').forEach(closeModal);
+          navLinks.classList.remove('open');
+          menuToggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
